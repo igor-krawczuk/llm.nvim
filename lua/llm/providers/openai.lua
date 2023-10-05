@@ -5,6 +5,8 @@ local provider_util = require('llm.providers.util')
 local M = {}
 local STATIC_DEFAULT_URL='https://api.openai.com/v1/'
 local STATIC_DEFAULT_ENDPOINT='chat/completions'
+local STATIC_DEFAULT_MODEL='gpt-3.5-turbo'
+local DEFAULT_MODEL=STATIC_DEFAULT_MODEL
 
 local DEFAULT_ENDPOINT = STATIC_DEFAULT_ENDPOINT
 local DEFAULT_URL=STATIC_DEFAULT_URL
@@ -14,9 +16,12 @@ end
 if os.getenv("vLLM_API_ENDPOINT") then
   DEFAULT_ENDPOINT=os.getenv("vLLM_API_ENDPOINT") --only the v1/ if set for vllm
 end
+if os.getenv("vLLM_MODEL") then
+  DEFAULT_MODEL=os.getenv("vLLM_MODEL") --only the v1/ if set for vllm
+end
 
 local default_params = {
-  model = 'gpt-3.5-turbo',
+  model = DEFAULT_MODEL,
   stream = true
 }
 
