@@ -3,6 +3,16 @@ local util = require('llm.util')
 local provider_util = require('llm.providers.util')
 
 local M = {}
+local STATIC_DEFAULT_URL='https://api.openai.com/v1/'
+local STATIC_DEFAULT_ENDPOINT='chat/completions'
+local DEFAULT_ENDPOINT = STATIC_DEFAULT_ENDPOINT
+local DEFAULT_URL=STATIC_DEFAULT_URL
+if os.getenv("vLLM_API_URL") then
+  DEFAULT_URL=os.getenv("vLLM_API_URL") -- minus the v1/
+end
+if os.getenv("vLLM_API_ENDPOINT") then
+  DEFAULT_URL=os.getenv("vLLM_API_ENDPOINT") --only the v1/ if set for vllm
+end
 
 local default_params = {
   model = 'gpt-3.5-turbo',
@@ -51,8 +61,8 @@ function M.request_completion(handlers, params, options)
   local _all_content = ''
   options = options or {}
 
-  local endpoint = options.endpoint or 'chat/completions'
-  local extract_data = endpoint == 'chat/completions' and extract_chat_data or extract_completion_data
+  local endpoint = options.endpoint or DEFAULT_ENDPOINT
+  local extract_data = endpoint == DEFAULT_ENDPOINT and extract_chat_data or extract_completion_data
 
   -- TODO should handlers being optional be a choice at the provider level or always optional for all providers?
   local _handlers = vim.tbl_extend("force", {
@@ -107,10 +117,12 @@ function M.request_completion(handlers, params, options)
     end
   else
     -- default to OpenAI api
-    url_ = 'https://api.openai.com/v1/'
+    url_ = DEFAULT_URL
 
     -- only check the OpenAI env key if options.url wasn't set
+    if DEFAULT_URL==STATIC_DEFAULT_URL then
     headers.Authorization = 'Bearer ' .. util.env_memo('OPENAI_API_KEY')
+    end
   end
 
   return curl.stream({
