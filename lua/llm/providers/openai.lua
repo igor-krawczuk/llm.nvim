@@ -5,13 +5,14 @@ local provider_util = require('llm.providers.util')
 local M = {}
 local STATIC_DEFAULT_URL='https://api.openai.com/v1/'
 local STATIC_DEFAULT_ENDPOINT='chat/completions'
+
 local DEFAULT_ENDPOINT = STATIC_DEFAULT_ENDPOINT
 local DEFAULT_URL=STATIC_DEFAULT_URL
 if os.getenv("vLLM_API_URL") then
   DEFAULT_URL=os.getenv("vLLM_API_URL") -- minus the v1/
 end
 if os.getenv("vLLM_API_ENDPOINT") then
-  DEFAULT_URL=os.getenv("vLLM_API_ENDPOINT") --only the v1/ if set for vllm
+  DEFAULT_ENDPOINT=os.getenv("vLLM_API_ENDPOINT") --only the v1/ if set for vllm
 end
 
 local default_params = {
